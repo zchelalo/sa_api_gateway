@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 
@@ -16,7 +15,7 @@ func main() {
 		log.Fatal("cannot load config:", err)
 	}
 
-	ctx := context.Background()
+	ctx := bootstrap.InitContext()
 
 	logger := bootstrap.InitLogger()
 	address := fmt.Sprintf("0.0.0.0:%d", config.Port)

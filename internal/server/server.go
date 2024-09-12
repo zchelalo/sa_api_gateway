@@ -29,7 +29,7 @@ func NewServer(ctx context.Context, logger *log.Logger, address string, cc *grpc
 }
 
 func (s *Server) Start() {
-	userRouter := userInfrastructure.NewUserRouter(s.ctx, s.cc, s.router)
+	userRouter := userInfrastructure.NewUserRouter(s.ctx, s.logger, s.cc, s.router)
 	userRouter.SetRoutes()
 
 	server := &http.Server{

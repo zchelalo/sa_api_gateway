@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"context"
 	"log"
 	"os"
 
@@ -19,4 +20,8 @@ func InitGRPCClient(address string) (*grpc.ClientConn, error) {
 	}
 
 	return cc, nil
+}
+
+func InitContext() context.Context {
+	return context.Background()
 }
