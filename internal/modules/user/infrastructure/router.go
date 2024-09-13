@@ -22,12 +22,12 @@ type UserRouter struct {
 var userGRPCClient userProto.UserServiceClient
 
 func NewUserRouter(ctx context.Context, logger *log.Logger, cc grpc.ClientConnInterface, router *http.ServeMux) *UserRouter {
-	userGRPCClient = userProto.NewUserServiceClient(cc)
+	userGRPCClient := userProto.NewUserServiceClient(cc)
 	userRepository := NewGRPCRepository(ctx, logger, userGRPCClient)
 	userUseCases := userApplication.NewUserUseCases(ctx, logger, userRepository)
 	userHandler := NewUserHandler(ctx, logger, userUseCases)
 
-	middleware := middleware.NewMiddleware(logger)
+	middleware := middleware.NewMiddleware(ctx, logger)
 
 	return &UserRouter{
 		ctx:         ctx,

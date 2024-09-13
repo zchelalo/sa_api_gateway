@@ -1,30 +1,40 @@
 package util
 
 import (
+	"sync"
+
 	"github.com/spf13/viper"
 )
 
-// Config contains the configuration of the application.
-// The values are read from environment variables.
+var (
+	config Config
+	once   sync.Once
+)
+
 type Config struct {
 	Port                   int32  `mapstructure:"PORT"`
 	UserMicroserviceDomain string `mapstructure:"USER_MS_DOMAIN"`
 	AuthMicroserviceDomain string `mapstructure:"AUTH_MS_DOMAIN"`
 }
 
-// LoadConfig reads configuration from file or environment variables.
-func LoadConfig(path string) (config Config, err error) {
-	viper.AddConfigPath(path)
-	viper.SetConfigName("app")
-	viper.SetConfigType("env")
+func LoadConfig(path string) (Config, error) {
+	var err error
+	once.Do(func() {
+		viper.AddConfigPath(path)
+		viper.SetConfigName("app")
+		viper.SetConfigType("env")
+		viper.AutomaticEnv()
 
-	viper.AutomaticEnv()
+		err = viper.ReadInConfig()
+		if err != nil {
+			return
+		}
 
-	err = viper.ReadInConfig()
-	if err != nil {
-		return
-	}
+		err = viper.Unmarshal(&config)
+	})
+	return config, err
+}
 
-	err = viper.Unmarshal(&config)
-	return
+func GetConfig() Config {
+	return config
 }

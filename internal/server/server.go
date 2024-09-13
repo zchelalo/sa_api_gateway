@@ -7,8 +7,8 @@ import (
 	"time"
 
 	userInfrastructure "github.com/zchelalo/sa_api_gateway/internal/modules/user/infrastructure"
+	"github.com/zchelalo/sa_api_gateway/pkg/bootstrap"
 	"github.com/zchelalo/sa_api_gateway/pkg/constants"
-	"google.golang.org/grpc"
 )
 
 type Server struct {
@@ -16,21 +16,20 @@ type Server struct {
 	logger  *log.Logger
 	router  *http.ServeMux
 	address string
-	conns   map[string]*grpc.ClientConn
 }
 
-func NewServer(ctx context.Context, logger *log.Logger, address string, conns map[string]*grpc.ClientConn) *Server {
+func NewServer(ctx context.Context, logger *log.Logger, address string) *Server {
 	return &Server{
 		ctx:     ctx,
 		logger:  logger,
 		router:  http.NewServeMux(),
 		address: address,
-		conns:   conns,
 	}
 }
 
 func (s *Server) Start() {
-	userRouter := userInfrastructure.NewUserRouter(s.ctx, s.logger, s.conns[string(constants.UserMicroserviceDomain)], s.router)
+	userGRPCClient := bootstrap.GetGRPCClient(constants.UserMicroserviceDomain)
+	userRouter := userInfrastructure.NewUserRouter(s.ctx, s.logger, userGRPCClient, s.router)
 	userRouter.SetRoutes()
 
 	server := &http.Server{

@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"log"
 	"net/http"
 )
@@ -9,7 +10,7 @@ type Middleware struct {
 	logger *log.Logger
 }
 
-func NewMiddleware(logger *log.Logger) *Middleware {
+func NewMiddleware(ctx context.Context, logger *log.Logger) *Middleware {
 	return &Middleware{
 		logger: logger,
 	}
