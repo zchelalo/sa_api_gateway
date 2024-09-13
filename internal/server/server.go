@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"log"
 	"net/http"
 	"time"
@@ -12,16 +11,12 @@ import (
 )
 
 type Server struct {
-	ctx     context.Context
-	logger  *log.Logger
 	router  *http.ServeMux
 	address string
 }
 
-func NewServer(ctx context.Context, logger *log.Logger, address string) *Server {
+func NewServer(address string) *Server {
 	return &Server{
-		ctx:     ctx,
-		logger:  logger,
 		router:  http.NewServeMux(),
 		address: address,
 	}
@@ -29,7 +24,7 @@ func NewServer(ctx context.Context, logger *log.Logger, address string) *Server 
 
 func (s *Server) Start() {
 	userGRPCClient := bootstrap.GetGRPCClient(constants.UserMicroserviceDomain)
-	userRouter := userInfrastructure.NewUserRouter(s.ctx, s.logger, userGRPCClient, s.router)
+	userRouter := userInfrastructure.NewUserRouter(userGRPCClient, s.router)
 	userRouter.SetRoutes()
 
 	server := &http.Server{
@@ -39,9 +34,11 @@ func (s *Server) Start() {
 		ReadTimeout:  10 * time.Second,
 	}
 
+	logger := bootstrap.GetLogger()
+
 	errCh := make(chan error)
 	go func() {
-		s.logger.Printf("Server is listening on %s", s.address)
+		logger.Printf("Server is listening on %s", s.address)
 		errCh <- server.ListenAndServe()
 	}()
 

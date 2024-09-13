@@ -6,12 +6,12 @@ import (
 )
 
 var (
-	client *http.Client
-	once   sync.Once
+	client         *http.Client
+	restClientOnce sync.Once
 )
 
 func InitRESTClient() {
-	once.Do(func() {
+	restClientOnce.Do(func() {
 		client = &http.Client{}
 	})
 }

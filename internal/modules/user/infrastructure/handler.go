@@ -2,7 +2,6 @@ package userInfrastructure
 
 import (
 	"context"
-	"log"
 	"net/http"
 
 	userApplication "github.com/zchelalo/sa_api_gateway/internal/modules/user/application"
@@ -14,14 +13,12 @@ import (
 
 type UserHandler struct {
 	ctx          context.Context
-	logger       *log.Logger
 	userUseCases *userApplication.UserUseCases
 }
 
-func NewUserHandler(ctx context.Context, logger *log.Logger, userUseCases *userApplication.UserUseCases) *UserHandler {
+func NewUserHandler(ctx context.Context, userUseCases *userApplication.UserUseCases) *UserHandler {
 	return &UserHandler{
 		ctx:          ctx,
-		logger:       logger,
 		userUseCases: userUseCases,
 	}
 }

@@ -2,17 +2,16 @@ package middleware
 
 import (
 	"context"
-	"log"
 	"net/http"
 )
 
 type Middleware struct {
-	logger *log.Logger
+	ctx context.Context
 }
 
-func NewMiddleware(ctx context.Context, logger *log.Logger) *Middleware {
+func NewMiddleware(ctx context.Context) *Middleware {
 	return &Middleware{
-		logger: logger,
+		ctx: ctx,
 	}
 }
 

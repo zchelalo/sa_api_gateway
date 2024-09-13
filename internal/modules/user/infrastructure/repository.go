@@ -3,7 +3,6 @@ package userInfrastructure
 import (
 	"context"
 	"errors"
-	"log"
 
 	userDomain "github.com/zchelalo/sa_api_gateway/internal/modules/user/domain"
 	userErrors "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
@@ -13,14 +12,12 @@ import (
 
 type GRPCRepository struct {
 	ctx    context.Context
-	logger *log.Logger
 	client userProto.UserServiceClient
 }
 
-func NewGRPCRepository(ctx context.Context, logger *log.Logger, client userProto.UserServiceClient) userDomain.UserRepository {
+func NewGRPCRepository(ctx context.Context, client userProto.UserServiceClient) userDomain.UserRepository {
 	return &GRPCRepository{
 		ctx:    ctx,
-		logger: logger,
 		client: client,
 	}
 }

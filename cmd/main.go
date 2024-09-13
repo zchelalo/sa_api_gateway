@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/zchelalo/sa_api_gateway/internal/server"
@@ -11,8 +10,9 @@ import (
 )
 
 func main() {
-	logger := bootstrap.InitLogger()
-	ctx := context.Background()
+	bootstrap.InitLogger()
+
+	logger := bootstrap.GetLogger()
 
 	config, err := util.LoadConfig(".")
 	if err != nil {
@@ -35,6 +35,6 @@ func main() {
 		}
 	}
 
-	s := server.NewServer(ctx, logger, address)
+	s := server.NewServer(address)
 	s.Start()
 }

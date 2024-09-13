@@ -2,21 +2,18 @@ package userApplication
 
 import (
 	"context"
-	"log"
 
 	userDomain "github.com/zchelalo/sa_api_gateway/internal/modules/user/domain"
 )
 
 type UserUseCases struct {
 	ctx            context.Context
-	logger         *log.Logger
 	userRepository userDomain.UserRepository
 }
 
-func NewUserUseCases(ctx context.Context, logger *log.Logger, userRepository userDomain.UserRepository) *UserUseCases {
+func NewUserUseCases(ctx context.Context, userRepository userDomain.UserRepository) *UserUseCases {
 	return &UserUseCases{
 		ctx:            ctx,
-		logger:         logger,
 		userRepository: userRepository,
 	}
 }
