@@ -7,7 +7,6 @@ import (
 
 	userInfrastructure "github.com/zchelalo/sa_api_gateway/internal/modules/user/infrastructure"
 	"github.com/zchelalo/sa_api_gateway/pkg/bootstrap"
-	"github.com/zchelalo/sa_api_gateway/pkg/constants"
 )
 
 type Server struct {
@@ -23,8 +22,7 @@ func NewServer(address string) *Server {
 }
 
 func (s *Server) Start() {
-	userGRPCClient := bootstrap.GetGRPCClient(constants.UserMicroserviceDomain)
-	userRouter := userInfrastructure.NewUserRouter(userGRPCClient, s.router)
+	userRouter := userInfrastructure.NewUserRouter(s.router)
 	userRouter.SetRoutes()
 
 	server := &http.Server{

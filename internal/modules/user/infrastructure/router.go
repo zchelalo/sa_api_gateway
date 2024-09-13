@@ -6,8 +6,9 @@ import (
 
 	"github.com/zchelalo/sa_api_gateway/internal/middleware"
 	userApplication "github.com/zchelalo/sa_api_gateway/internal/modules/user/application"
+	"github.com/zchelalo/sa_api_gateway/pkg/bootstrap"
+	"github.com/zchelalo/sa_api_gateway/pkg/constants"
 	userProto "github.com/zchelalo/sa_api_gateway/pkg/proto/user"
-	"google.golang.org/grpc"
 )
 
 type UserRouter struct {
@@ -18,10 +19,11 @@ type UserRouter struct {
 
 var userGRPCClient userProto.UserServiceClient
 
-func NewUserRouter(cc grpc.ClientConnInterface, router *http.ServeMux) *UserRouter {
+func NewUserRouter(router *http.ServeMux) *UserRouter {
 	ctx := context.Background()
 
-	userGRPCClient := userProto.NewUserServiceClient(cc)
+	clientConn := bootstrap.GetGRPCClient(constants.UserMicroserviceDomain)
+	userGRPCClient = userProto.NewUserServiceClient(clientConn)
 	userRepository := NewGRPCRepository(ctx, userGRPCClient)
 	userUseCases := userApplication.NewUserUseCases(ctx, userRepository)
 	userHandler := NewUserHandler(ctx, userUseCases)
