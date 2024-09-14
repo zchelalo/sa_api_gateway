@@ -12,9 +12,10 @@ var (
 )
 
 type Config struct {
-	Port                   int32  `mapstructure:"PORT"`
-	UserMicroserviceDomain string `mapstructure:"USER_MS_DOMAIN"`
-	AuthMicroserviceDomain string `mapstructure:"AUTH_MS_DOMAIN"`
+	Port                    int32  `mapstructure:"PORT"`
+	UserMicroserviceDomain  string `mapstructure:"USER_MS_DOMAIN"`
+	AuthMicroserviceDomain  string `mapstructure:"AUTH_MS_DOMAIN"`
+	AuthMicroserviceRestUrl string `mapstructure:"AUTH_MS_REST_URL"`
 }
 
 func LoadConfig(path string) (Config, error) {
