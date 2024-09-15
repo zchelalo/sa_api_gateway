@@ -5,6 +5,7 @@ import (
 
 	"github.com/zchelalo/sa_api_gateway/pkg/constants"
 	"github.com/zchelalo/sa_api_gateway/pkg/response"
+	"github.com/zchelalo/sa_api_gateway/pkg/util"
 )
 
 func (mdw *Middleware) Auth(next http.Handler) http.Handler {
@@ -24,6 +25,7 @@ func (mdw *Middleware) Auth(next http.Handler) http.Handler {
 		}
 
 		auth, err := mdw.authUseCases.IsAuthorized(accessToken.Value, refreshToken.Value)
+
 		if err != nil {
 			errorResponse := response.Unauthorized("", err.Error())
 			response.WriteErrorResponse(w, errorResponse)
@@ -37,23 +39,11 @@ func (mdw *Middleware) Auth(next http.Handler) http.Handler {
 		}
 
 		if auth.Tokens.AccessToken != accessToken.Value {
-			http.SetCookie(w, &http.Cookie{
-				Name:     string(constants.CookieAccessToken),
-				Value:    auth.Tokens.AccessToken,
-				HttpOnly: true,
-				SameSite: http.SameSiteNoneMode,
-				Secure:   false,
-			})
+			http.SetCookie(w, util.CreateCookie(constants.CookieAccessToken, auth.Tokens.AccessToken, auth.Tokens.ExpiresAt))
 		}
 
 		if auth.Tokens.RefreshToken != refreshToken.Value {
-			http.SetCookie(w, &http.Cookie{
-				Name:     string(constants.CookieRefreshToken),
-				Value:    auth.Tokens.RefreshToken,
-				HttpOnly: true,
-				SameSite: http.SameSiteNoneMode,
-				Secure:   false,
-			})
+			http.SetCookie(w, util.CreateCookie(constants.CookieRefreshToken, auth.Tokens.RefreshToken, auth.Tokens.ExpiresAt))
 		}
 
 		next.ServeHTTP(w, r)

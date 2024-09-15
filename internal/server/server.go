@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	authInfrastructure "github.com/zchelalo/sa_api_gateway/internal/modules/auth/infrastructure"
 	userInfrastructure "github.com/zchelalo/sa_api_gateway/internal/modules/user/infrastructure"
 	"github.com/zchelalo/sa_api_gateway/pkg/bootstrap"
 )
@@ -24,6 +25,9 @@ func NewServer(address string) *Server {
 func (s *Server) Start() {
 	userRouter := userInfrastructure.NewUserRouter(s.router)
 	userRouter.SetRoutes()
+
+	authRouter := authInfrastructure.NewAuthRouter(s.router)
+	authRouter.SetRoutes()
 
 	server := &http.Server{
 		Addr:         s.address,

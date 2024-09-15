@@ -5,11 +5,13 @@ import userDomain "github.com/zchelalo/sa_api_gateway/internal/modules/user/doma
 type Tokens struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
+	ExpiresAt    int64  `json:"expires_at"`
 }
 
 type AuthEntity struct {
 	AccessToken  string                `json:"access_token"`
 	RefreshToken string                `json:"refresh_token"`
+	ExpiresAt    int64                 `json:"expires_at"`
 	User         userDomain.UserEntity `json:"user"`
 }
 

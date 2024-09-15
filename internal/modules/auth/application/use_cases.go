@@ -20,18 +20,23 @@ func NewAuthUseCases(ctx context.Context, authRepository authDomain.AuthReposito
 	}
 }
 
-func (authUseCases *AuthUseCases) SignIn(email, password string) (*authDomain.AuthEntity, error) {
-	err := userDomain.IsEmailValid(email)
+func (authUseCases *AuthUseCases) SignIn(signInRequest *SignInRequest) (*authDomain.AuthEntity, error) {
+	err := userDomain.IsEmailValid(signInRequest.Email)
 	if err != nil {
 		return nil, err
 	}
 
-	err = userDomain.IsPasswordValid(password)
+	err = userDomain.IsPasswordValid(signInRequest.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	return authUseCases.authRepository.SignIn(email, password)
+	return authUseCases.authRepository.SignIn(signInRequest.Email, signInRequest.Password)
+}
+
+type SignInRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func (authUseCases *AuthUseCases) SignUp(name, email, password string) (*authDomain.AuthEntity, error) {

@@ -70,6 +70,7 @@ func (r *GRPCRepository) SignIn(email, password string) (*authDomain.AuthEntity,
 		User:         user,
 		AccessToken:  authObtained.GetAccessToken(),
 		RefreshToken: authObtained.GetRefreshToken(),
+		ExpiresAt:    authObtained.GetExpiresAt(),
 	}, nil
 }
 
@@ -117,6 +118,7 @@ func (r *GRPCRepository) SignUp(name, email, password string) (*authDomain.AuthE
 		User:         user,
 		AccessToken:  authObtained.GetAccessToken(),
 		RefreshToken: authObtained.GetRefreshToken(),
+		ExpiresAt:    authObtained.GetExpiresAt(),
 	}, nil
 }
 
@@ -168,6 +170,7 @@ func (r *GRPCRepository) IsAuthorized(accessToken, refreshToken string) (*authDo
 		Tokens: authDomain.Tokens{
 			AccessToken:  authObtained.Tokens.GetAccessToken(),
 			RefreshToken: authObtained.Tokens.GetRefreshToken(),
+			ExpiresAt:    authObtained.Tokens.GetExpiresAt(),
 		},
 	}, nil
 }
