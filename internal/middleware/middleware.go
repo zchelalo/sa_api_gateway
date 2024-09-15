@@ -3,15 +3,19 @@ package middleware
 import (
 	"context"
 	"net/http"
+
+	authApplication "github.com/zchelalo/sa_api_gateway/internal/modules/auth/application"
 )
 
 type Middleware struct {
-	ctx context.Context
+	ctx          context.Context
+	authUseCases *authApplication.AuthUseCases
 }
 
-func NewMiddleware(ctx context.Context) *Middleware {
+func NewMiddleware(ctx context.Context, authUseCases *authApplication.AuthUseCases) *Middleware {
 	return &Middleware{
-		ctx: ctx,
+		ctx:          ctx,
+		authUseCases: authUseCases,
 	}
 }
 
