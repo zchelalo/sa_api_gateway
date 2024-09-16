@@ -20,6 +20,11 @@ func NewAuthUseCases(ctx context.Context, authRepository authDomain.AuthReposito
 	}
 }
 
+type SignInRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 func (authUseCases *AuthUseCases) SignIn(signInRequest *SignInRequest) (*authDomain.AuthEntity, error) {
 	err := userDomain.IsEmailValid(signInRequest.Email)
 	if err != nil {
@@ -34,28 +39,29 @@ func (authUseCases *AuthUseCases) SignIn(signInRequest *SignInRequest) (*authDom
 	return authUseCases.authRepository.SignIn(signInRequest.Email, signInRequest.Password)
 }
 
-type SignInRequest struct {
+type SignUpRequest struct {
+	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-func (authUseCases *AuthUseCases) SignUp(name, email, password string) (*authDomain.AuthEntity, error) {
-	err := userDomain.IsNameValid(name)
+func (authUseCases *AuthUseCases) SignUp(signUpRequest *SignUpRequest) (*authDomain.AuthEntity, error) {
+	err := userDomain.IsNameValid(signUpRequest.Name)
 	if err != nil {
 		return nil, err
 	}
 
-	err = userDomain.IsEmailValid(email)
+	err = userDomain.IsEmailValid(signUpRequest.Email)
 	if err != nil {
 		return nil, err
 	}
 
-	err = userDomain.IsPasswordValid(password)
+	err = userDomain.IsPasswordValid(signUpRequest.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	return authUseCases.authRepository.SignUp(name, email, password)
+	return authUseCases.authRepository.SignUp(signUpRequest.Name, signUpRequest.Email, signUpRequest.Password)
 }
 
 func (authUseCases *AuthUseCases) SignOut(refreshToken string) error {

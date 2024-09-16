@@ -66,3 +66,48 @@ func (authHandler *AuthHandler) SignIn(w http.ResponseWriter, req *http.Request)
 	resp := response.OK("", auth.User)
 	response.WriteSuccessResponse(w, resp)
 }
+
+func (authHandler *AuthHandler) SignUp(w http.ResponseWriter, req *http.Request) {
+	request := &authApplication.SignUpRequest{}
+
+	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
+		resp := response.BadRequest("", err.Error())
+		response.WriteErrorResponse(w, resp)
+		return
+	}
+
+	auth, err := authHandler.authUseCases.SignUp(request)
+	if err != nil {
+		badRequestErrors := []error{
+			userErrors.ErrNameRequired,
+			userErrors.ErrNameInvalid,
+			userErrors.ErrEmailRequired,
+			userErrors.ErrEmailInvalid,
+			userErrors.ErrPasswordRequired,
+			userErrors.ErrPasswordInvalid,
+		}
+		for _, badRequestError := range badRequestErrors {
+			if err == badRequestError {
+				resp := response.BadRequest("", err.Error())
+				response.WriteErrorResponse(w, resp)
+				return
+			}
+		}
+
+		if err == userErrors.ErrEmailAlreadyExists {
+			resp := response.Conflict("", err.Error())
+			response.WriteErrorResponse(w, resp)
+			return
+		}
+
+		resp := response.InternalServerError("", err.Error())
+		response.WriteErrorResponse(w, resp)
+		return
+	}
+
+	http.SetCookie(w, util.CreateCookie(constants.CookieAccessToken, auth.AccessToken, auth.ExpiresAt))
+	http.SetCookie(w, util.CreateCookie(constants.CookieRefreshToken, auth.RefreshToken, auth.ExpiresAt))
+
+	resp := response.OK("", auth.User)
+	response.WriteSuccessResponse(w, resp)
+}

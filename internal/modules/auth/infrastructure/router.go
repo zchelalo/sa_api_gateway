@@ -39,4 +39,5 @@ func NewAuthRouter(router *http.ServeMux) *AuthRouter {
 
 func (r *AuthRouter) SetRoutes() {
 	r.router.Handle("POST /auth/sign-in", middleware.ApplyMiddlewares(http.HandlerFunc(r.authHandler.SignIn), r.middleware.Logger))
+	r.router.Handle("POST /auth/sign-up", middleware.ApplyMiddlewares(http.HandlerFunc(r.authHandler.SignUp), r.middleware.Logger))
 }
