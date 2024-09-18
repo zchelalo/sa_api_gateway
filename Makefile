@@ -4,6 +4,9 @@ compose:
 composebuild:
 	docker compose -f ./.dockers/docker-compose.yml up --build
 
+composebuilddetached:
+	docker compose -f ./.dockers/docker-compose.yml up --build -d
+
 protouser:
 	protoc --experimental_allow_proto3_optional \
 	  --go_out=./pkg/proto --go_opt=paths=source_relative \
