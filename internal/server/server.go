@@ -58,13 +58,14 @@ func accessControl(h http.Handler) http.Handler {
 		if origin := req.Header.Get("Origin"); allowOrigins[origin] {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 		} else {
-			w.Header().Set("Access-Control-Allow-Origin", "null")
+			w.Header().Set("Access-Control-Allow-Origin", "*")
 		}
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS, HEAD")
 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Authorization, Cache-Control, Content-Type, DNT, If-Modified-Since, Keep-Alive, Origin, User-Agent, X-Requested-With")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 		if req.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
 			return
 		}
 

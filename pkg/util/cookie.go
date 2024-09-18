@@ -8,7 +8,7 @@ import (
 )
 
 func secondsToTime(seconds int64) time.Time {
-	return time.Unix(seconds, 0)
+	return time.Now().Add(time.Duration(seconds) * time.Second)
 }
 
 func CreateCookie(name constants.CookieConstants, value string, expiresAt int64) *http.Cookie {
@@ -20,5 +20,6 @@ func CreateCookie(name constants.CookieConstants, value string, expiresAt int64)
 		SameSite: http.SameSiteNoneMode,
 		Secure:   false,
 		Expires:  expires,
+		Path:     "/",
 	}
 }
