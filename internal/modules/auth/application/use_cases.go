@@ -9,13 +9,11 @@ import (
 )
 
 type AuthUseCases struct {
-	ctx            context.Context
 	authRepository authDomain.AuthRepository
 }
 
-func NewAuthUseCases(ctx context.Context, authRepository authDomain.AuthRepository) *AuthUseCases {
+func NewAuthUseCases(authRepository authDomain.AuthRepository) *AuthUseCases {
 	return &AuthUseCases{
-		ctx:            ctx,
 		authRepository: authRepository,
 	}
 }
@@ -25,7 +23,7 @@ type SignInRequest struct {
 	Password string `json:"password"`
 }
 
-func (authUseCases *AuthUseCases) SignIn(signInRequest *SignInRequest) (*authDomain.AuthEntity, error) {
+func (authUseCases *AuthUseCases) SignIn(ctx context.Context, signInRequest *SignInRequest) (*authDomain.AuthEntity, error) {
 	err := userDomain.IsEmailValid(signInRequest.Email)
 	if err != nil {
 		return nil, err
@@ -36,7 +34,7 @@ func (authUseCases *AuthUseCases) SignIn(signInRequest *SignInRequest) (*authDom
 		return nil, err
 	}
 
-	return authUseCases.authRepository.SignIn(signInRequest.Email, signInRequest.Password)
+	return authUseCases.authRepository.SignIn(ctx, signInRequest.Email, signInRequest.Password)
 }
 
 type SignUpRequest struct {
@@ -45,7 +43,7 @@ type SignUpRequest struct {
 	Password string `json:"password"`
 }
 
-func (authUseCases *AuthUseCases) SignUp(signUpRequest *SignUpRequest) (*authDomain.AuthEntity, error) {
+func (authUseCases *AuthUseCases) SignUp(ctx context.Context, signUpRequest *SignUpRequest) (*authDomain.AuthEntity, error) {
 	err := userDomain.IsNameValid(signUpRequest.Name)
 	if err != nil {
 		return nil, err
@@ -61,19 +59,19 @@ func (authUseCases *AuthUseCases) SignUp(signUpRequest *SignUpRequest) (*authDom
 		return nil, err
 	}
 
-	return authUseCases.authRepository.SignUp(signUpRequest.Name, signUpRequest.Email, signUpRequest.Password)
+	return authUseCases.authRepository.SignUp(ctx, signUpRequest.Name, signUpRequest.Email, signUpRequest.Password)
 }
 
-func (authUseCases *AuthUseCases) SignOut(refreshToken string) error {
+func (authUseCases *AuthUseCases) SignOut(ctx context.Context, refreshToken string) error {
 	err := authDomain.IsTokenValid(refreshToken, constants.RefreshToken)
 	if err != nil {
 		return err
 	}
 
-	return authUseCases.authRepository.SignOut(refreshToken)
+	return authUseCases.authRepository.SignOut(ctx, refreshToken)
 }
 
-func (authUseCases *AuthUseCases) IsAuthorized(accessToken, refreshToken string) (*authDomain.AuthorizeEntity, error) {
+func (authUseCases *AuthUseCases) IsAuthorized(ctx context.Context, accessToken, refreshToken string) (*authDomain.AuthorizeEntity, error) {
 	err := authDomain.IsTokenValid(accessToken, constants.AccessToken)
 	if err != nil {
 		return nil, err
@@ -84,5 +82,5 @@ func (authUseCases *AuthUseCases) IsAuthorized(accessToken, refreshToken string)
 		return nil, err
 	}
 
-	return authUseCases.authRepository.IsAuthorized(accessToken, refreshToken)
+	return authUseCases.authRepository.IsAuthorized(ctx, accessToken, refreshToken)
 }

@@ -7,22 +7,20 @@ import (
 )
 
 type UserUseCases struct {
-	ctx            context.Context
 	userRepository userDomain.UserRepository
 }
 
-func NewUserUseCases(ctx context.Context, userRepository userDomain.UserRepository) *UserUseCases {
+func NewUserUseCases(userRepository userDomain.UserRepository) *UserUseCases {
 	return &UserUseCases{
-		ctx:            ctx,
 		userRepository: userRepository,
 	}
 }
 
-func (userUseCases *UserUseCases) Get(id string) (*userDomain.UserEntity, error) {
+func (userUseCases *UserUseCases) Get(ctx context.Context, id string) (*userDomain.UserEntity, error) {
 	err := userDomain.IsIdValid(id)
 	if err != nil {
 		return nil, err
 	}
 
-	return userUseCases.userRepository.Get(id)
+	return userUseCases.userRepository.Get(ctx, id)
 }

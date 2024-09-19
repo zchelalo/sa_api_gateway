@@ -14,19 +14,17 @@ import (
 )
 
 type GRPCRepository struct {
-	ctx    context.Context
 	client authProto.AuthServiceClient
 }
 
-func NewGRPCRepository(ctx context.Context, client authProto.AuthServiceClient) authDomain.AuthRepository {
+func NewGRPCRepository(client authProto.AuthServiceClient) authDomain.AuthRepository {
 	return &GRPCRepository{
-		ctx:    ctx,
 		client: client,
 	}
 }
 
-func (r *GRPCRepository) SignIn(email, password string) (*authDomain.AuthEntity, error) {
-	auth, err := r.client.SignIn(r.ctx, &authProto.SignInRequest{
+func (r *GRPCRepository) SignIn(ctx context.Context, email, password string) (*authDomain.AuthEntity, error) {
+	auth, err := r.client.SignIn(ctx, &authProto.SignInRequest{
 		Email:    email,
 		Password: password,
 	})
@@ -75,8 +73,8 @@ func (r *GRPCRepository) SignIn(email, password string) (*authDomain.AuthEntity,
 	}, nil
 }
 
-func (r *GRPCRepository) SignUp(name, email, password string) (*authDomain.AuthEntity, error) {
-	auth, err := r.client.SignUp(r.ctx, &authProto.SignUpRequest{
+func (r *GRPCRepository) SignUp(ctx context.Context, name, email, password string) (*authDomain.AuthEntity, error) {
+	auth, err := r.client.SignUp(ctx, &authProto.SignUpRequest{
 		Name:     name,
 		Email:    email,
 		Password: password,
@@ -123,8 +121,8 @@ func (r *GRPCRepository) SignUp(name, email, password string) (*authDomain.AuthE
 	}, nil
 }
 
-func (r *GRPCRepository) SignOut(refreshToken string) error {
-	auth, err := r.client.SignOut(r.ctx, &authProto.SignOutRequest{
+func (r *GRPCRepository) SignOut(ctx context.Context, refreshToken string) error {
+	auth, err := r.client.SignOut(ctx, &authProto.SignOutRequest{
 		RefreshToken: refreshToken,
 	})
 	if err != nil {
@@ -154,8 +152,8 @@ func (r *GRPCRepository) SignOut(refreshToken string) error {
 	return nil
 }
 
-func (r *GRPCRepository) IsAuthorized(accessToken, refreshToken string) (*authDomain.AuthorizeEntity, error) {
-	auth, err := r.client.IsAuthorized(r.ctx, &authProto.IsAuthorizedRequest{
+func (r *GRPCRepository) IsAuthorized(ctx context.Context, accessToken, refreshToken string) (*authDomain.AuthorizeEntity, error) {
+	auth, err := r.client.IsAuthorized(ctx, &authProto.IsAuthorizedRequest{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	})
@@ -188,6 +186,7 @@ func (r *GRPCRepository) IsAuthorized(accessToken, refreshToken string) (*authDo
 
 	return &authDomain.AuthorizeEntity{
 		IsAuthorized: authObtained.GetIsAuthorized(),
+		UserID:       authObtained.GetUserId(),
 		Tokens: authDomain.Tokens{
 			AccessToken:  authObtained.Tokens.GetAccessToken(),
 			RefreshToken: authObtained.Tokens.GetRefreshToken(),

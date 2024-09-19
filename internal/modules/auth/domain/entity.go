@@ -17,5 +17,6 @@ type AuthEntity struct {
 
 type AuthorizeEntity struct {
 	Tokens       Tokens `json:"tokens"`
+	UserID       string `json:"user_id"`
 	IsAuthorized bool   `json:"is_authorized"`
 }

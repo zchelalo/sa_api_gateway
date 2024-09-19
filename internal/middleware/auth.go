@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/zchelalo/sa_api_gateway/pkg/constants"
@@ -9,22 +10,22 @@ import (
 )
 
 func (mdw *Middleware) Auth(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		accessToken, err := r.Cookie(string(constants.CookieAccessToken))
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		accessToken, err := req.Cookie(string(constants.CookieAccessToken))
 		if err != nil {
 			errorResponse := response.Unauthorized("", "access token is required")
 			response.WriteErrorResponse(w, errorResponse)
 			return
 		}
 
-		refreshToken, err := r.Cookie(string(constants.CookieRefreshToken))
+		refreshToken, err := req.Cookie(string(constants.CookieRefreshToken))
 		if err != nil {
 			errorResponse := response.Unauthorized("", "refresh token is required")
 			response.WriteErrorResponse(w, errorResponse)
 			return
 		}
 
-		auth, err := mdw.authUseCases.IsAuthorized(accessToken.Value, refreshToken.Value)
+		auth, err := mdw.authUseCases.IsAuthorized(req.Context(), accessToken.Value, refreshToken.Value)
 
 		if err != nil {
 			errorResponse := response.Unauthorized("", err.Error())
@@ -46,6 +47,8 @@ func (mdw *Middleware) Auth(next http.Handler) http.Handler {
 			http.SetCookie(w, util.CreateCookie(constants.CookieRefreshToken, auth.Tokens.RefreshToken, auth.Tokens.ExpiresAt))
 		}
 
-		next.ServeHTTP(w, r)
+		ctx := context.WithValue(req.Context(), constants.ContextUserID, auth.UserID)
+
+		next.ServeHTTP(w, req.WithContext(ctx))
 	})
 }

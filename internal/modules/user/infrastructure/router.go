@@ -1,7 +1,6 @@
 package userInfrastructure
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/zchelalo/sa_api_gateway/internal/middleware"
@@ -24,20 +23,18 @@ var userGRPCClient userProto.UserServiceClient
 var authGRPCClient authProto.AuthServiceClient
 
 func NewUserRouter(router *http.ServeMux) *UserRouter {
-	ctx := context.Background()
-
 	userClientConn := bootstrap.GetGRPCClient(constants.UserMicroserviceDomain)
 	userGRPCClient = userProto.NewUserServiceClient(userClientConn)
-	userRepository := NewGRPCRepository(ctx, userGRPCClient)
-	userUseCases := userApplication.NewUserUseCases(ctx, userRepository)
-	userHandler := NewUserHandler(ctx, userUseCases)
+	userRepository := NewGRPCRepository(userGRPCClient)
+	userUseCases := userApplication.NewUserUseCases(userRepository)
+	userHandler := NewUserHandler(userUseCases)
 
 	authClientConn := bootstrap.GetGRPCClient(constants.AuthMicroserviceDomain)
 	authGRPCClient = authProto.NewAuthServiceClient(authClientConn)
-	authRepository := authInfrastructure.NewGRPCRepository(ctx, authGRPCClient)
-	authUseCases := authApplication.NewAuthUseCases(ctx, authRepository)
+	authRepository := authInfrastructure.NewGRPCRepository(authGRPCClient)
+	authUseCases := authApplication.NewAuthUseCases(authRepository)
 
-	middleware := middleware.NewMiddleware(ctx, authUseCases)
+	middleware := middleware.NewMiddleware(authUseCases)
 
 	return &UserRouter{
 		router:      router,
@@ -47,5 +44,5 @@ func NewUserRouter(router *http.ServeMux) *UserRouter {
 }
 
 func (r *UserRouter) SetRoutes() {
-	r.router.Handle("GET /users/{id}", middleware.ApplyMiddlewares(http.HandlerFunc(r.userHandler.Get), r.middleware.Auth, r.middleware.Logger))
+	r.router.Handle("GET /profile", middleware.ApplyMiddlewares(http.HandlerFunc(r.userHandler.Get), r.middleware.Auth, r.middleware.Logger))
 }

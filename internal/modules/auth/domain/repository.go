@@ -1,8 +1,10 @@
 package authDomain
 
+import "context"
+
 type AuthRepository interface {
-	SignIn(email, password string) (*AuthEntity, error)
-	SignUp(name, email, password string) (*AuthEntity, error)
-	SignOut(refreshToken string) error
-	IsAuthorized(accessToken, refreshToken string) (*AuthorizeEntity, error)
+	SignIn(ctx context.Context, email, password string) (*AuthEntity, error)
+	SignUp(ctx context.Context, name, email, password string) (*AuthEntity, error)
+	SignOut(ctx context.Context, refreshToken string) error
+	IsAuthorized(ctx context.Context, accessToken, refreshToken string) (*AuthorizeEntity, error)
 }

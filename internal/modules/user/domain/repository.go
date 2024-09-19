@@ -1,5 +1,7 @@
 package userDomain
 
+import "context"
+
 type UserRepository interface {
-	Get(id string) (*UserEntity, error)
+	Get(ctx context.Context, id string) (*UserEntity, error)
 }

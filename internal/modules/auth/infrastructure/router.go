@@ -1,7 +1,6 @@
 package authInfrastructure
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/zchelalo/sa_api_gateway/internal/middleware"
@@ -20,15 +19,13 @@ type AuthRouter struct {
 var authGRPCClient authProto.AuthServiceClient
 
 func NewAuthRouter(router *http.ServeMux) *AuthRouter {
-	ctx := context.Background()
-
 	authClientConn := bootstrap.GetGRPCClient(constants.AuthMicroserviceDomain)
 	authGRPCClient = authProto.NewAuthServiceClient(authClientConn)
-	authRepository := NewGRPCRepository(ctx, authGRPCClient)
-	authUseCases := authApplication.NewAuthUseCases(ctx, authRepository)
-	authHandler := NewAuthHandler(ctx, authUseCases)
+	authRepository := NewGRPCRepository(authGRPCClient)
+	authUseCases := authApplication.NewAuthUseCases(authRepository)
+	authHandler := NewAuthHandler(authUseCases)
 
-	middleware := middleware.NewMiddleware(ctx, authUseCases)
+	middleware := middleware.NewMiddleware(authUseCases)
 
 	return &AuthRouter{
 		router:      router,

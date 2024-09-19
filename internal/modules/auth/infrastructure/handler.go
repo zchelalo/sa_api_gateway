@@ -1,7 +1,6 @@
 package authInfrastructure
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -15,13 +14,11 @@ import (
 )
 
 type AuthHandler struct {
-	ctx          context.Context
 	authUseCases *authApplication.AuthUseCases
 }
 
-func NewAuthHandler(ctx context.Context, authUseCases *authApplication.AuthUseCases) *AuthHandler {
+func NewAuthHandler(authUseCases *authApplication.AuthUseCases) *AuthHandler {
 	return &AuthHandler{
-		ctx:          ctx,
 		authUseCases: authUseCases,
 	}
 }
@@ -35,7 +32,7 @@ func (authHandler *AuthHandler) SignIn(w http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	auth, err := authHandler.authUseCases.SignIn(request)
+	auth, err := authHandler.authUseCases.SignIn(req.Context(), request)
 	if err != nil {
 		badRequestErrors := []error{
 			userErrors.ErrEmailRequired,
@@ -78,7 +75,7 @@ func (authHandler *AuthHandler) SignUp(w http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	auth, err := authHandler.authUseCases.SignUp(request)
+	auth, err := authHandler.authUseCases.SignUp(req.Context(), request)
 	if err != nil {
 		badRequestErrors := []error{
 			userErrors.ErrNameRequired,
@@ -122,7 +119,7 @@ func (authHandler *AuthHandler) SignOut(w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	err = authHandler.authUseCases.SignOut(refreshToken.Value)
+	err = authHandler.authUseCases.SignOut(req.Context(), refreshToken.Value)
 	if err != nil {
 		if errors.As(err, &authErrors.ErrTokenInvalid{}) || errors.As(err, &authErrors.ErrTokenExpired{}) {
 			resp := response.Unauthorized("", err.Error())

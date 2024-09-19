@@ -11,19 +11,17 @@ import (
 )
 
 type GRPCRepository struct {
-	ctx    context.Context
 	client userProto.UserServiceClient
 }
 
-func NewGRPCRepository(ctx context.Context, client userProto.UserServiceClient) userDomain.UserRepository {
+func NewGRPCRepository(client userProto.UserServiceClient) userDomain.UserRepository {
 	return &GRPCRepository{
-		ctx:    ctx,
 		client: client,
 	}
 }
 
-func (r *GRPCRepository) Get(id string) (*userDomain.UserEntity, error) {
-	user, err := r.client.GetUser(r.ctx, &userProto.GetUserRequest{
+func (r *GRPCRepository) Get(ctx context.Context, id string) (*userDomain.UserEntity, error) {
+	user, err := r.client.GetUser(ctx, &userProto.GetUserRequest{
 		Id: id,
 	})
 	if err != nil {

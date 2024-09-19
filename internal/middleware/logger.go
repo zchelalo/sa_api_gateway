@@ -8,12 +8,12 @@ import (
 )
 
 func (mdw *Middleware) Logger(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		logger := bootstrap.GetLogger()
 
 		start := time.Now()
-		next.ServeHTTP(w, r)
+		next.ServeHTTP(w, req)
 		duration := time.Since(start)
-		logger.Printf("Method: %s, URI: %s, Duration: %v", r.Method, r.RequestURI, duration)
+		logger.Printf("Method: %s, URI: %s, Duration: %v", req.Method, req.RequestURI, duration)
 	})
 }

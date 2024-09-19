@@ -1,7 +1,6 @@
 package userInfrastructure
 
 import (
-	"context"
 	"net/http"
 
 	userApplication "github.com/zchelalo/sa_api_gateway/internal/modules/user/application"
@@ -12,19 +11,29 @@ import (
 )
 
 type UserHandler struct {
-	ctx          context.Context
 	userUseCases *userApplication.UserUseCases
 }
 
-func NewUserHandler(ctx context.Context, userUseCases *userApplication.UserUseCases) *UserHandler {
+func NewUserHandler(userUseCases *userApplication.UserUseCases) *UserHandler {
 	return &UserHandler{
-		ctx:          ctx,
 		userUseCases: userUseCases,
 	}
 }
 
 func (userHandler *UserHandler) Get(w http.ResponseWriter, req *http.Request) {
-	id := req.PathValue(string(constants.ID))
+	idContext := req.Context().Value(constants.ContextUserID)
+
+	if idContext == nil {
+		resp := response.Unauthorized("", "unauthorized")
+		response.WriteErrorResponse(w, resp)
+		return
+	}
+
+	id, ok := idContext.(string)
+	if !ok {
+		resp := response.Unauthorized("", "unauthorized")
+		response.WriteErrorResponse(w, resp)
+	}
 
 	if err := userDomain.IsIdValid(id); err != nil {
 		resp := response.BadRequest("", err.Error())
@@ -32,7 +41,7 @@ func (userHandler *UserHandler) Get(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user, err := userHandler.userUseCases.Get(id)
+	user, err := userHandler.userUseCases.Get(req.Context(), id)
 	if err != nil {
 		if err == userErrors.ErrIdInvalid || err == userErrors.ErrIdRequired {
 			resp := response.BadRequest("", err.Error())
