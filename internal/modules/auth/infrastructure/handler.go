@@ -24,6 +24,13 @@ func NewAuthHandler(authUseCases *authApplication.AuthUseCases) *AuthHandler {
 }
 
 func (authHandler *AuthHandler) SignIn(w http.ResponseWriter, req *http.Request) {
+	_, err := req.Cookie(string(constants.CookieRefreshToken))
+	if err == nil {
+		resp := response.Unauthorized("", "you are already signed in")
+		response.WriteErrorResponse(w, resp)
+		return
+	}
+
 	request := &authApplication.SignInRequest{}
 
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
@@ -67,6 +74,13 @@ func (authHandler *AuthHandler) SignIn(w http.ResponseWriter, req *http.Request)
 }
 
 func (authHandler *AuthHandler) SignUp(w http.ResponseWriter, req *http.Request) {
+	_, err := req.Cookie(string(constants.CookieRefreshToken))
+	if err == nil {
+		resp := response.Unauthorized("", "you are already signed in")
+		response.WriteErrorResponse(w, resp)
+		return
+	}
+
 	request := &authApplication.SignUpRequest{}
 
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
