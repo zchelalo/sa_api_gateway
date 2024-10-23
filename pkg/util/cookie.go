@@ -17,7 +17,7 @@ func CreateCookie(name constants.CookieConstants, value string, expiresAt int64)
 		Name:     string(name),
 		Value:    value,
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: http.SameSiteLaxMode,
 		Secure:   false,
 		Expires:  expires,
 		Path:     "/",
