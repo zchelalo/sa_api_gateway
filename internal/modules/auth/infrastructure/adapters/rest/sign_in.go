@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	authApplication "github.com/zchelalo/sa_api_gateway/internal/modules/auth/application"
-	userErrors "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
+	userError "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
 	"github.com/zchelalo/sa_api_gateway/pkg/constants"
 	"github.com/zchelalo/sa_api_gateway/pkg/response"
 	"github.com/zchelalo/sa_api_gateway/pkg/util"
@@ -30,10 +30,10 @@ func (handler *Handler) SignIn(w http.ResponseWriter, req *http.Request) {
 	auth, err := handler.useCases.SignIn(req.Context(), request)
 	if err != nil {
 		badRequestErrors := []error{
-			userErrors.ErrEmailRequired,
-			userErrors.ErrEmailInvalid,
-			userErrors.ErrPasswordRequired,
-			userErrors.ErrPasswordInvalid,
+			userError.ErrEmailRequired,
+			userError.ErrEmailInvalid,
+			userError.ErrPasswordRequired,
+			userError.ErrPasswordInvalid,
 		}
 		for _, badRequestError := range badRequestErrors {
 			if err == badRequestError {
@@ -43,7 +43,7 @@ func (handler *Handler) SignIn(w http.ResponseWriter, req *http.Request) {
 			}
 		}
 
-		if err == userErrors.ErrUserNotFound {
+		if err == userError.ErrUserNotFound {
 			resp := response.NotFound("", err.Error())
 			response.WriteErrorResponse(w, resp)
 			return

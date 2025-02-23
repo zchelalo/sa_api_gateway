@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	userDomain "github.com/zchelalo/sa_api_gateway/internal/modules/user/domain"
-	userErrors "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
+	userError "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
 	"github.com/zchelalo/sa_api_gateway/pkg/constants"
 	"github.com/zchelalo/sa_api_gateway/pkg/response"
 )
@@ -32,13 +32,13 @@ func (handler *Handler) Get(w http.ResponseWriter, req *http.Request) {
 
 	user, err := handler.useCases.Get(req.Context(), id)
 	if err != nil {
-		if err == userErrors.ErrIdInvalid || err == userErrors.ErrIdRequired {
+		if err == userError.ErrIdInvalid || err == userError.ErrIdRequired {
 			resp := response.BadRequest("", err.Error())
 			response.WriteErrorResponse(w, resp)
 			return
 		}
 
-		if err == userErrors.ErrUserNotFound {
+		if err == userError.ErrUserNotFound {
 			resp := response.NotFound("", err.Error())
 			response.WriteErrorResponse(w, resp)
 			return

@@ -1,4 +1,4 @@
-package userErrors
+package userError
 
 import "errors"
 

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	authErrors "github.com/zchelalo/sa_api_gateway/internal/modules/auth/errors"
+	authError "github.com/zchelalo/sa_api_gateway/internal/modules/auth/errors"
 	"github.com/zchelalo/sa_api_gateway/pkg/constants"
 	"github.com/zchelalo/sa_api_gateway/pkg/response"
 	"github.com/zchelalo/sa_api_gateway/pkg/util"
@@ -20,13 +20,13 @@ func (handler *Handler) SignOut(w http.ResponseWriter, req *http.Request) {
 
 	err = handler.useCases.SignOut(req.Context(), refreshToken.Value)
 	if err != nil {
-		if errors.As(err, &authErrors.ErrTokenInvalid{}) || errors.As(err, &authErrors.ErrTokenExpired{}) {
+		if errors.As(err, &authError.ErrTokenInvalid{}) || errors.As(err, &authError.ErrTokenExpired{}) {
 			resp := response.Unauthorized("", err.Error())
 			response.WriteErrorResponse(w, resp)
 			return
 		}
 
-		if err == authErrors.ErrSignOutFailed {
+		if err == authError.ErrSignOutFailed {
 			resp := response.InternalServerError("", err.Error())
 			response.WriteErrorResponse(w, resp)
 			return

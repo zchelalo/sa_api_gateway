@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	authApplication "github.com/zchelalo/sa_api_gateway/internal/modules/auth/application"
-	userErrors "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
+	userError "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
 	"github.com/zchelalo/sa_api_gateway/pkg/constants"
 	"github.com/zchelalo/sa_api_gateway/pkg/response"
 	"github.com/zchelalo/sa_api_gateway/pkg/util"
@@ -30,12 +30,12 @@ func (handler *Handler) SignUp(w http.ResponseWriter, req *http.Request) {
 	auth, err := handler.useCases.SignUp(req.Context(), request)
 	if err != nil {
 		badRequestErrors := []error{
-			userErrors.ErrNameRequired,
-			userErrors.ErrNameInvalid,
-			userErrors.ErrEmailRequired,
-			userErrors.ErrEmailInvalid,
-			userErrors.ErrPasswordRequired,
-			userErrors.ErrPasswordInvalid,
+			userError.ErrNameRequired,
+			userError.ErrNameInvalid,
+			userError.ErrEmailRequired,
+			userError.ErrEmailInvalid,
+			userError.ErrPasswordRequired,
+			userError.ErrPasswordInvalid,
 		}
 		for _, badRequestError := range badRequestErrors {
 			if err == badRequestError {
@@ -45,7 +45,7 @@ func (handler *Handler) SignUp(w http.ResponseWriter, req *http.Request) {
 			}
 		}
 
-		if err == userErrors.ErrEmailAlreadyExists {
+		if err == userError.ErrEmailAlreadyExists {
 			resp := response.Conflict("", err.Error())
 			response.WriteErrorResponse(w, resp)
 			return

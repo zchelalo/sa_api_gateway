@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	userDomain "github.com/zchelalo/sa_api_gateway/internal/modules/user/domain"
-	userErrors "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
+	userError "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
 	"github.com/zchelalo/sa_api_gateway/pkg/proto"
 	"google.golang.org/grpc/codes"
 )
@@ -24,10 +24,10 @@ func (r *GRPCRepository) Get(ctx context.Context, id string) (*userDomain.UserEn
 		errorMessage := errorObtained.GetMessage()
 
 		if int32(codes.InvalidArgument) == errorCode {
-			return nil, userErrors.ErrIdInvalid
+			return nil, userError.ErrIdInvalid
 		}
 		if int32(codes.NotFound) == errorCode {
-			return nil, userErrors.ErrUserNotFound
+			return nil, userError.ErrUserNotFound
 		}
 		if int32(codes.Internal) == errorCode {
 			return nil, errors.New(errorMessage)
@@ -38,7 +38,7 @@ func (r *GRPCRepository) Get(ctx context.Context, id string) (*userDomain.UserEn
 
 	userObtained := user.GetUser()
 	if userObtained == nil {
-		return nil, userErrors.ErrUserNotFound
+		return nil, userError.ErrUserNotFound
 	}
 
 	return &userDomain.UserEntity{

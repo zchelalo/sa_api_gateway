@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	authErrors "github.com/zchelalo/sa_api_gateway/internal/modules/auth/errors"
+	authError "github.com/zchelalo/sa_api_gateway/internal/modules/auth/errors"
 	"github.com/zchelalo/sa_api_gateway/pkg/constants"
 	"github.com/zchelalo/sa_api_gateway/pkg/proto"
 	"google.golang.org/grpc/codes"
@@ -24,7 +24,7 @@ func (r *GRPCRepository) SignOut(ctx context.Context, refreshToken string) error
 		errorMessage := errorObtained.GetMessage()
 
 		if int32(codes.InvalidArgument) == errorCode {
-			return authErrors.ErrTokenInvalid{Name: constants.RefreshToken}
+			return authError.ErrTokenInvalid{Name: constants.RefreshToken}
 		}
 		if int32(codes.Internal) == errorCode {
 			return errors.New(errorMessage)
@@ -35,7 +35,7 @@ func (r *GRPCRepository) SignOut(ctx context.Context, refreshToken string) error
 
 	success := auth.GetSuccess()
 	if !success {
-		return authErrors.ErrSignOutFailed
+		return authError.ErrSignOutFailed
 	}
 
 	return nil

@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	authDomain "github.com/zchelalo/sa_api_gateway/internal/modules/auth/domain"
-	authErrors "github.com/zchelalo/sa_api_gateway/internal/modules/auth/errors"
+	authError "github.com/zchelalo/sa_api_gateway/internal/modules/auth/errors"
 	"github.com/zchelalo/sa_api_gateway/pkg/proto"
 	"google.golang.org/grpc/codes"
 )
@@ -25,10 +25,10 @@ func (r *GRPCRepository) IsAuthorized(ctx context.Context, accessToken, refreshT
 		errorMessage := errorObtained.GetMessage()
 
 		if int32(codes.InvalidArgument) == errorCode {
-			return nil, authErrors.ErrDataInvalid
+			return nil, authError.ErrDataInvalid
 		}
 		if int32(codes.Unauthenticated) == errorCode || int32(codes.PermissionDenied) == errorCode {
-			return nil, authErrors.ErrUnauthorized
+			return nil, authError.ErrUnauthorized
 		}
 		if int32(codes.Internal) == errorCode {
 			return nil, errors.New(errorMessage)
@@ -39,7 +39,7 @@ func (r *GRPCRepository) IsAuthorized(ctx context.Context, accessToken, refreshT
 
 	authObtained := auth.GetData()
 	if authObtained == nil {
-		return nil, authErrors.ErrUnauthorized
+		return nil, authError.ErrUnauthorized
 	}
 
 	return &authDomain.AuthorizeEntity{

@@ -5,9 +5,9 @@ import (
 	"errors"
 
 	authDomain "github.com/zchelalo/sa_api_gateway/internal/modules/auth/domain"
-	authErrors "github.com/zchelalo/sa_api_gateway/internal/modules/auth/errors"
+	authError "github.com/zchelalo/sa_api_gateway/internal/modules/auth/errors"
 	userDomain "github.com/zchelalo/sa_api_gateway/internal/modules/user/domain"
-	userErrors "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
+	userError "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
 	"github.com/zchelalo/sa_api_gateway/pkg/proto"
 	"google.golang.org/grpc/codes"
 )
@@ -28,10 +28,10 @@ func (r *GRPCRepository) SignUp(ctx context.Context, name, email, password strin
 		errorMessage := errorObtained.GetMessage()
 
 		if int32(codes.InvalidArgument) == errorCode {
-			return nil, authErrors.ErrDataInvalid
+			return nil, authError.ErrDataInvalid
 		}
 		if int32(codes.AlreadyExists) == errorCode {
-			return nil, userErrors.ErrEmailAlreadyExists
+			return nil, userError.ErrEmailAlreadyExists
 		}
 		if int32(codes.Internal) == errorCode {
 			return nil, errors.New(errorMessage)
@@ -42,7 +42,7 @@ func (r *GRPCRepository) SignUp(ctx context.Context, name, email, password strin
 
 	authObtained := auth.GetAuth()
 	if authObtained == nil {
-		return nil, authErrors.ErrSignUpFailed
+		return nil, authError.ErrSignUpFailed
 	}
 
 	user := userDomain.UserEntity{

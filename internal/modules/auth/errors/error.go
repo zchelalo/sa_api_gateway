@@ -1,4 +1,4 @@
-package authErrors
+package authError
 
 import (
 	"errors"

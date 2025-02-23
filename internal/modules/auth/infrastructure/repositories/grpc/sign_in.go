@@ -5,9 +5,9 @@ import (
 	"errors"
 
 	authDomain "github.com/zchelalo/sa_api_gateway/internal/modules/auth/domain"
-	authErrors "github.com/zchelalo/sa_api_gateway/internal/modules/auth/errors"
+	authError "github.com/zchelalo/sa_api_gateway/internal/modules/auth/errors"
 	userDomain "github.com/zchelalo/sa_api_gateway/internal/modules/user/domain"
-	userErrors "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
+	userError "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
 	"github.com/zchelalo/sa_api_gateway/pkg/proto"
 	"google.golang.org/grpc/codes"
 )
@@ -27,13 +27,13 @@ func (r *GRPCRepository) SignIn(ctx context.Context, email, password string) (*a
 		errorMessage := errorObtained.GetMessage()
 
 		if int32(codes.InvalidArgument) == errorCode {
-			return nil, authErrors.ErrDataInvalid
+			return nil, authError.ErrDataInvalid
 		}
 		if int32(codes.NotFound) == errorCode {
-			return nil, userErrors.ErrUserNotFound
+			return nil, userError.ErrUserNotFound
 		}
 		if int32(codes.Unauthenticated) == errorCode || int32(codes.PermissionDenied) == errorCode {
-			return nil, authErrors.ErrUnauthorized
+			return nil, authError.ErrUnauthorized
 		}
 		if int32(codes.Internal) == errorCode {
 			return nil, errors.New(errorMessage)
@@ -44,7 +44,7 @@ func (r *GRPCRepository) SignIn(ctx context.Context, email, password string) (*a
 
 	authObtained := auth.GetAuth()
 	if authObtained == nil {
-		return nil, userErrors.ErrUserNotFound
+		return nil, userError.ErrUserNotFound
 	}
 
 	user := userDomain.UserEntity{
