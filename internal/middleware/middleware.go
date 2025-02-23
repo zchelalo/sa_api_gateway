@@ -7,10 +7,10 @@ import (
 )
 
 type Middleware struct {
-	authUseCases *authApplication.AuthUseCases
+	authUseCases *authApplication.UseCases
 }
 
-func NewMiddleware(authUseCases *authApplication.AuthUseCases) *Middleware {
+func NewMiddleware(authUseCases *authApplication.UseCases) *Middleware {
 	return &Middleware{
 		authUseCases: authUseCases,
 	}

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	authInfrastructure "github.com/zchelalo/sa_api_gateway/internal/modules/auth/infrastructure"
+	authREST "github.com/zchelalo/sa_api_gateway/internal/modules/auth/infrastructure/adapters/rest"
 	userREST "github.com/zchelalo/sa_api_gateway/internal/modules/user/infrastructure/adapters/rest"
 	"github.com/zchelalo/sa_api_gateway/pkg/bootstrap"
 )
@@ -26,7 +26,7 @@ func (s *Server) Start() {
 	userRouter := userREST.New(s.router)
 	userRouter.SetRoutes()
 
-	authRouter := authInfrastructure.NewAuthRouter(s.router)
+	authRouter := authREST.NewAuthRouter(s.router)
 	authRouter.SetRoutes()
 
 	server := &http.Server{
