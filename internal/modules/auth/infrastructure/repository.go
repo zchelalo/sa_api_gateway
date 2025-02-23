@@ -9,22 +9,22 @@ import (
 	userDomain "github.com/zchelalo/sa_api_gateway/internal/modules/user/domain"
 	userErrors "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
 	"github.com/zchelalo/sa_api_gateway/pkg/constants"
-	authProto "github.com/zchelalo/sa_api_gateway/pkg/proto/auth"
+	"github.com/zchelalo/sa_api_gateway/pkg/proto"
 	"google.golang.org/grpc/codes"
 )
 
 type GRPCRepository struct {
-	client authProto.AuthServiceClient
+	client proto.AuthServiceClient
 }
 
-func NewGRPCRepository(client authProto.AuthServiceClient) authDomain.AuthRepository {
+func NewGRPCRepository(client proto.AuthServiceClient) authDomain.AuthRepository {
 	return &GRPCRepository{
 		client: client,
 	}
 }
 
 func (r *GRPCRepository) SignIn(ctx context.Context, email, password string) (*authDomain.AuthEntity, error) {
-	auth, err := r.client.SignIn(ctx, &authProto.SignInRequest{
+	auth, err := r.client.SignIn(ctx, &proto.SignInRequest{
 		Email:    email,
 		Password: password,
 	})
@@ -74,7 +74,7 @@ func (r *GRPCRepository) SignIn(ctx context.Context, email, password string) (*a
 }
 
 func (r *GRPCRepository) SignUp(ctx context.Context, name, email, password string) (*authDomain.AuthEntity, error) {
-	auth, err := r.client.SignUp(ctx, &authProto.SignUpRequest{
+	auth, err := r.client.SignUp(ctx, &proto.SignUpRequest{
 		Name:     name,
 		Email:    email,
 		Password: password,
@@ -122,7 +122,7 @@ func (r *GRPCRepository) SignUp(ctx context.Context, name, email, password strin
 }
 
 func (r *GRPCRepository) SignOut(ctx context.Context, refreshToken string) error {
-	auth, err := r.client.SignOut(ctx, &authProto.SignOutRequest{
+	auth, err := r.client.SignOut(ctx, &proto.SignOutRequest{
 		RefreshToken: refreshToken,
 	})
 	if err != nil {
@@ -153,7 +153,7 @@ func (r *GRPCRepository) SignOut(ctx context.Context, refreshToken string) error
 }
 
 func (r *GRPCRepository) IsAuthorized(ctx context.Context, accessToken, refreshToken string) (*authDomain.AuthorizeEntity, error) {
-	auth, err := r.client.IsAuthorized(ctx, &authProto.IsAuthorizedRequest{
+	auth, err := r.client.IsAuthorized(ctx, &proto.IsAuthorizedRequest{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	})

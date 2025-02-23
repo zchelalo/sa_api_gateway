@@ -7,7 +7,7 @@ import (
 	authApplication "github.com/zchelalo/sa_api_gateway/internal/modules/auth/application"
 	"github.com/zchelalo/sa_api_gateway/pkg/bootstrap"
 	"github.com/zchelalo/sa_api_gateway/pkg/constants"
-	authProto "github.com/zchelalo/sa_api_gateway/pkg/proto/auth"
+	"github.com/zchelalo/sa_api_gateway/pkg/proto"
 )
 
 type AuthRouter struct {
@@ -16,11 +16,11 @@ type AuthRouter struct {
 	middleware  *middleware.Middleware
 }
 
-var authGRPCClient authProto.AuthServiceClient
+var authGRPCClient proto.AuthServiceClient
 
 func NewAuthRouter(router *http.ServeMux) *AuthRouter {
 	authClientConn := bootstrap.GetGRPCClient(constants.AuthMicroserviceDomain)
-	authGRPCClient = authProto.NewAuthServiceClient(authClientConn)
+	authGRPCClient = proto.NewAuthServiceClient(authClientConn)
 	authRepository := NewGRPCRepository(authGRPCClient)
 	authUseCases := authApplication.NewAuthUseCases(authRepository)
 	authHandler := NewAuthHandler(authUseCases)
