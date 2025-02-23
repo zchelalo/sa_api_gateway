@@ -1,4 +1,4 @@
-package userInfrastructure
+package userGRPCRepo
 
 import (
 	"context"
@@ -9,16 +9,6 @@ import (
 	"github.com/zchelalo/sa_api_gateway/pkg/proto"
 	"google.golang.org/grpc/codes"
 )
-
-type GRPCRepository struct {
-	client proto.UserServiceClient
-}
-
-func NewGRPCRepository(client proto.UserServiceClient) userDomain.UserRepository {
-	return &GRPCRepository{
-		client: client,
-	}
-}
 
 func (r *GRPCRepository) Get(ctx context.Context, id string) (*userDomain.UserEntity, error) {
 	user, err := r.client.GetUser(ctx, &proto.GetUserRequest{

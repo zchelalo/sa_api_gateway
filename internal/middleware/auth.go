@@ -26,7 +26,6 @@ func (mdw *Middleware) Auth(next http.Handler) http.Handler {
 		}
 
 		auth, err := mdw.authUseCases.IsAuthorized(req.Context(), accessToken.Value, refreshToken.Value)
-
 		if err != nil {
 			errorResponse := response.Unauthorized("", err.Error())
 			response.WriteErrorResponse(w, errorResponse)

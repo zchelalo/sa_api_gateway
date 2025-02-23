@@ -6,21 +6,21 @@ import (
 	userDomain "github.com/zchelalo/sa_api_gateway/internal/modules/user/domain"
 )
 
-type UserUseCases struct {
+type UseCases struct {
 	userRepository userDomain.UserRepository
 }
 
-func NewUserUseCases(userRepository userDomain.UserRepository) *UserUseCases {
-	return &UserUseCases{
+func New(userRepository userDomain.UserRepository) *UseCases {
+	return &UseCases{
 		userRepository: userRepository,
 	}
 }
 
-func (userUseCases *UserUseCases) Get(ctx context.Context, id string) (*userDomain.UserEntity, error) {
+func (useCases *UseCases) Get(ctx context.Context, id string) (*userDomain.UserEntity, error) {
 	err := userDomain.IsIdValid(id)
 	if err != nil {
 		return nil, err
 	}
 
-	return userUseCases.userRepository.Get(ctx, id)
+	return useCases.userRepository.Get(ctx, id)
 }
