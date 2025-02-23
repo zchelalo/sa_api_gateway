@@ -1,18 +1,23 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 
-	authApplication "github.com/zchelalo/sa_api_gateway/internal/modules/auth/application"
+	authDomain "github.com/zchelalo/sa_api_gateway/internal/modules/auth/domain"
 )
 
-type Middleware struct {
-	authUseCases *authApplication.UseCases
+type Authenticator interface {
+	IsAuthorized(ctx context.Context, accessToken, refreshToken string) (*authDomain.AuthorizeEntity, error)
 }
 
-func NewMiddleware(authUseCases *authApplication.UseCases) *Middleware {
+type Middleware struct {
+	authenticator Authenticator
+}
+
+func New(authenticator Authenticator) *Middleware {
 	return &Middleware{
-		authUseCases: authUseCases,
+		authenticator: authenticator,
 	}
 }
 

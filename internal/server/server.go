@@ -5,9 +5,16 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/zchelalo/sa_api_gateway/internal/middleware"
+	authApplication "github.com/zchelalo/sa_api_gateway/internal/modules/auth/application"
 	authREST "github.com/zchelalo/sa_api_gateway/internal/modules/auth/infrastructure/adapters/rest"
+	authGRPCRepo "github.com/zchelalo/sa_api_gateway/internal/modules/auth/infrastructure/repositories/grpc"
+	userApplication "github.com/zchelalo/sa_api_gateway/internal/modules/user/application"
 	userREST "github.com/zchelalo/sa_api_gateway/internal/modules/user/infrastructure/adapters/rest"
+	userGRPCRepo "github.com/zchelalo/sa_api_gateway/internal/modules/user/infrastructure/repositories/grpc"
 	"github.com/zchelalo/sa_api_gateway/pkg/bootstrap"
+	"github.com/zchelalo/sa_api_gateway/pkg/constants"
+	"github.com/zchelalo/sa_api_gateway/pkg/proto"
 )
 
 type Server struct {
@@ -16,6 +23,22 @@ type Server struct {
 }
 
 func NewServer(address string) *Server {
+	router := http.NewServeMux()
+
+	authGRPCClient := bootstrap.GetGRPCClient(constants.AuthMicroserviceDomain)
+	userGRPCClient := bootstrap.GetGRPCClient(constants.UserMicroserviceDomain)
+
+	authRepository := authGRPCRepo.New(proto.NewAuthServiceClient(authGRPCClient))
+	userRepository := userGRPCRepo.New(proto.NewUserServiceClient(userGRPCClient))
+
+	authUseCases := authApplication.New(authRepository)
+	userUseCases := userApplication.New(userRepository)
+
+	mdw := middleware.New(authUseCases)
+
+	authREST.New(router, authUseCases, mdw).SetRoutes()
+	userREST.New(router, userUseCases, mdw).SetRoutes()
+
 	return &Server{
 		router:  http.NewServeMux(),
 		address: address,
@@ -23,15 +46,9 @@ func NewServer(address string) *Server {
 }
 
 func (s *Server) Start() {
-	userRouter := userREST.New(s.router)
-	userRouter.SetRoutes()
-
-	authRouter := authREST.NewAuthRouter(s.router)
-	authRouter.SetRoutes()
-
 	server := &http.Server{
 		Addr:         s.address,
-		Handler:      accessControl(s.router),
+		Handler:      s.accessControl(s.router),
 		WriteTimeout: 10 * time.Second,
 		ReadTimeout:  10 * time.Second,
 	}
@@ -50,7 +67,7 @@ func (s *Server) Start() {
 	}
 }
 
-func accessControl(h http.Handler) http.Handler {
+func (s *Server) accessControl(h http.Handler) http.Handler {
 	allowOrigins := map[string]bool{
 		"http://localhost:5173": true,
 	}

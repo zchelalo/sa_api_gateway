@@ -5,10 +5,6 @@ import (
 
 	"github.com/zchelalo/sa_api_gateway/internal/middleware"
 	authApplication "github.com/zchelalo/sa_api_gateway/internal/modules/auth/application"
-	authGRPCRepo "github.com/zchelalo/sa_api_gateway/internal/modules/auth/infrastructure/repositories/grpc"
-	"github.com/zchelalo/sa_api_gateway/pkg/bootstrap"
-	"github.com/zchelalo/sa_api_gateway/pkg/constants"
-	"github.com/zchelalo/sa_api_gateway/pkg/proto"
 )
 
 type AuthRouter struct {
@@ -17,16 +13,8 @@ type AuthRouter struct {
 	middleware *middleware.Middleware
 }
 
-var authGRPCClient proto.AuthServiceClient
-
-func NewAuthRouter(router *http.ServeMux) *AuthRouter {
-	authClientConn := bootstrap.GetGRPCClient(constants.AuthMicroserviceDomain)
-	authGRPCClient = proto.NewAuthServiceClient(authClientConn)
-	authRepository := authGRPCRepo.New(authGRPCClient)
-	authUseCases := authApplication.New(authRepository)
+func New(router *http.ServeMux, authUseCases *authApplication.UseCases, middleware *middleware.Middleware) *AuthRouter {
 	handler := NewHandler(authUseCases)
-
-	middleware := middleware.NewMiddleware(authUseCases)
 
 	return &AuthRouter{
 		router:     router,
