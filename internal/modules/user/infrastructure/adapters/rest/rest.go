@@ -24,5 +24,5 @@ func New(router *http.ServeMux, userUseCases *userApplication.UseCases, middlewa
 }
 
 func (r *Router) SetRoutes() {
-	r.router.Handle("GET /profile", middleware.ApplyMiddlewares(http.HandlerFunc(r.handler.Get), r.middleware.Auth, r.middleware.Logger))
+	r.router.Handle("GET /profile", middleware.ApplyMiddlewares(http.HandlerFunc(r.handler.Get), r.middleware.Auth))
 }

@@ -1,18 +1,19 @@
 package classManagementREST
 
 import (
-	"encoding/json"
 	"net/http"
+	"strconv"
 
 	classManagementApplication "github.com/zchelalo/sa_api_gateway/internal/modules/class_management/application"
 	classManagementError "github.com/zchelalo/sa_api_gateway/internal/modules/class_management/error"
+	memberError "github.com/zchelalo/sa_api_gateway/internal/modules/member/error"
 	userError "github.com/zchelalo/sa_api_gateway/internal/modules/user/error"
 	"github.com/zchelalo/sa_api_gateway/pkg/constants"
 	"github.com/zchelalo/sa_api_gateway/pkg/response"
 	"github.com/zchelalo/sa_api_gateway/pkg/util"
 )
 
-func (handler *Handler) Create(w http.ResponseWriter, req *http.Request) {
+func (handler *Handler) ListMembers(w http.ResponseWriter, req *http.Request) {
 	idContext := req.Context().Value(constants.ContextUserID)
 
 	if idContext == nil {
@@ -27,26 +28,41 @@ func (handler *Handler) Create(w http.ResponseWriter, req *http.Request) {
 		response.WriteErrorResponse(w, resp)
 	}
 
-	request := &classManagementApplication.CreateRequest{}
-	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
-		resp := response.BadRequest("", err.Error())
+	queries := req.URL.Query()
+
+	page, err := strconv.Atoi(queries.Get("page"))
+	if err != nil {
+		resp := response.BadRequest("", "page is invalid")
 		response.WriteErrorResponse(w, resp)
 		return
 	}
-	request.UserID = id
 
-	class, err := handler.useCases.Create(req.Context(), request)
+	limit, err := strconv.Atoi(queries.Get("limit"))
+	if err != nil {
+		resp := response.BadRequest("", "limit is invalid")
+		response.WriteErrorResponse(w, resp)
+		return
+	}
+
+	classID := req.PathValue("classID")
+
+	request := &classManagementApplication.ListMembersRequest{
+		UserID:  id,
+		ClassID: classID,
+		Page:    int32(page),
+		Limit:   int32(limit),
+	}
+
+	members, meta, err := handler.useCases.ListMembers(req.Context(), request)
 	if err != nil {
 		badRequestErrors := []error{
 			userError.ErrIdInvalid,
 			userError.ErrIdRequired,
 
-			classManagementError.ErrNameRequired,
-			classManagementError.ErrNameTooShort,
-			classManagementError.ErrGradeRequired,
-			classManagementError.ErrGradeTooShort,
-			classManagementError.ErrSubjectRequired,
-			classManagementError.ErrSubjectTooShort,
+			classManagementError.ErrIdRequired,
+			classManagementError.ErrIdInvalid,
+			classManagementError.ErrPageInvalid,
+			classManagementError.ErrLimitInvalid,
 		}
 		if util.IsErrorType(err, badRequestErrors) {
 			resp := response.BadRequest("", err.Error())
@@ -54,7 +70,7 @@ func (handler *Handler) Create(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		if err == userError.ErrUserNotFound {
+		if err == userError.ErrUserNotFound || err == memberError.ErrMembersNotFound || err == classManagementError.ErrClassNotFound {
 			resp := response.NotFound("", err.Error())
 			response.WriteErrorResponse(w, resp)
 			return
@@ -65,6 +81,6 @@ func (handler *Handler) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	resp := response.OK("", class, nil)
+	resp := response.OK("", members, meta)
 	response.WriteSuccessResponse(w, resp)
 }

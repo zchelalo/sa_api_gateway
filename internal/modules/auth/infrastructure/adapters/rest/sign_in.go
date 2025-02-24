@@ -55,6 +55,6 @@ func (handler *Handler) SignIn(w http.ResponseWriter, req *http.Request) {
 	http.SetCookie(w, util.CreateCookie(constants.CookieAccessToken, auth.AccessToken, auth.ExpiresAt))
 	http.SetCookie(w, util.CreateCookie(constants.CookieRefreshToken, auth.RefreshToken, auth.ExpiresAt))
 
-	resp := response.OK("", auth.User)
+	resp := response.OK("", auth.User, nil)
 	response.WriteSuccessResponse(w, resp)
 }

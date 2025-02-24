@@ -24,5 +24,9 @@ func New(router *http.ServeMux, classUseCases *classManagementApplication.UseCas
 }
 
 func (r *Router) SetRoutes() {
-	r.router.Handle("POST /class", middleware.ApplyMiddlewares(http.HandlerFunc(r.handler.Create), r.middleware.Auth, r.middleware.Logger))
+	r.router.Handle("POST /classes", middleware.ApplyMiddlewares(http.HandlerFunc(r.handler.Create), r.middleware.Auth))
+	r.router.Handle("POST /classes/join", middleware.ApplyMiddlewares(http.HandlerFunc(r.handler.Join), r.middleware.Auth))
+	r.router.Handle("GET /classes", middleware.ApplyMiddlewares(http.HandlerFunc(r.handler.List), r.middleware.Auth))
+	r.router.Handle("GET /classes/{classID}/members", middleware.ApplyMiddlewares(http.HandlerFunc(r.handler.ListMembers), r.middleware.Auth))
+	r.router.Handle("GET /classes/{classID}/code", middleware.ApplyMiddlewares(http.HandlerFunc(r.handler.GetClassCode), r.middleware.Auth))
 }

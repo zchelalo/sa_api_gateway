@@ -40,6 +40,6 @@ func (handler *Handler) SignOut(w http.ResponseWriter, req *http.Request) {
 	http.SetCookie(w, util.CreateCookie(constants.CookieAccessToken, "", 0))
 	http.SetCookie(w, util.CreateCookie(constants.CookieRefreshToken, "", 0))
 
-	resp := response.OK("", nil)
+	resp := response.OK("", nil, nil)
 	response.WriteSuccessResponse(w, resp)
 }

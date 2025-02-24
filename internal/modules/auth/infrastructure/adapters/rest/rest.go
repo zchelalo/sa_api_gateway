@@ -24,7 +24,7 @@ func New(router *http.ServeMux, authUseCases *authApplication.UseCases, middlewa
 }
 
 func (r *AuthRouter) SetRoutes() {
-	r.router.Handle("POST /auth/sign-in", middleware.ApplyMiddlewares(http.HandlerFunc(r.handler.SignIn), r.middleware.Logger))
-	r.router.Handle("POST /auth/sign-up", middleware.ApplyMiddlewares(http.HandlerFunc(r.handler.SignUp), r.middleware.Logger))
-	r.router.Handle("POST /auth/sign-out", middleware.ApplyMiddlewares(http.HandlerFunc(r.handler.SignOut), r.middleware.Auth, r.middleware.Logger))
+	r.router.Handle("POST /auth/sign-in", middleware.ApplyMiddlewares(http.HandlerFunc(r.handler.SignIn)))
+	r.router.Handle("POST /auth/sign-up", middleware.ApplyMiddlewares(http.HandlerFunc(r.handler.SignUp)))
+	r.router.Handle("POST /auth/sign-out", middleware.ApplyMiddlewares(http.HandlerFunc(r.handler.SignOut), r.middleware.Auth))
 }

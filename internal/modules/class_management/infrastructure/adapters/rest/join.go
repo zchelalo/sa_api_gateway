@@ -12,7 +12,7 @@ import (
 	"github.com/zchelalo/sa_api_gateway/pkg/util"
 )
 
-func (handler *Handler) Create(w http.ResponseWriter, req *http.Request) {
+func (handler *Handler) Join(w http.ResponseWriter, req *http.Request) {
 	idContext := req.Context().Value(constants.ContextUserID)
 
 	if idContext == nil {
@@ -27,7 +27,7 @@ func (handler *Handler) Create(w http.ResponseWriter, req *http.Request) {
 		response.WriteErrorResponse(w, resp)
 	}
 
-	request := &classManagementApplication.CreateRequest{}
+	request := &classManagementApplication.JoinRequest{}
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		resp := response.BadRequest("", err.Error())
 		response.WriteErrorResponse(w, resp)
@@ -35,18 +35,14 @@ func (handler *Handler) Create(w http.ResponseWriter, req *http.Request) {
 	}
 	request.UserID = id
 
-	class, err := handler.useCases.Create(req.Context(), request)
+	class, err := handler.useCases.Join(req.Context(), request)
 	if err != nil {
 		badRequestErrors := []error{
 			userError.ErrIdInvalid,
 			userError.ErrIdRequired,
 
-			classManagementError.ErrNameRequired,
-			classManagementError.ErrNameTooShort,
-			classManagementError.ErrGradeRequired,
-			classManagementError.ErrGradeTooShort,
-			classManagementError.ErrSubjectRequired,
-			classManagementError.ErrSubjectTooShort,
+			classManagementError.ErrCodeRequired,
+			classManagementError.ErrCodeInvalid,
 		}
 		if util.IsErrorType(err, badRequestErrors) {
 			resp := response.BadRequest("", err.Error())
@@ -54,7 +50,7 @@ func (handler *Handler) Create(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		if err == userError.ErrUserNotFound {
+		if err == userError.ErrUserNotFound || err == classManagementError.ErrClassNotFound {
 			resp := response.NotFound("", err.Error())
 			response.WriteErrorResponse(w, resp)
 			return

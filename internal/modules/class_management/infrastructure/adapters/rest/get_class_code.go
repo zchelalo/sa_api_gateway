@@ -1,18 +1,18 @@
 package classManagementREST
 
 import (
-	"encoding/json"
 	"net/http"
 
 	classManagementApplication "github.com/zchelalo/sa_api_gateway/internal/modules/class_management/application"
 	classManagementError "github.com/zchelalo/sa_api_gateway/internal/modules/class_management/error"
+	memberError "github.com/zchelalo/sa_api_gateway/internal/modules/member/error"
 	userError "github.com/zchelalo/sa_api_gateway/internal/modules/user/error"
 	"github.com/zchelalo/sa_api_gateway/pkg/constants"
 	"github.com/zchelalo/sa_api_gateway/pkg/response"
 	"github.com/zchelalo/sa_api_gateway/pkg/util"
 )
 
-func (handler *Handler) Create(w http.ResponseWriter, req *http.Request) {
+func (handler *Handler) GetClassCode(w http.ResponseWriter, req *http.Request) {
 	idContext := req.Context().Value(constants.ContextUserID)
 
 	if idContext == nil {
@@ -27,26 +27,21 @@ func (handler *Handler) Create(w http.ResponseWriter, req *http.Request) {
 		response.WriteErrorResponse(w, resp)
 	}
 
-	request := &classManagementApplication.CreateRequest{}
-	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
-		resp := response.BadRequest("", err.Error())
-		response.WriteErrorResponse(w, resp)
-		return
-	}
-	request.UserID = id
+	classID := req.PathValue("classID")
 
-	class, err := handler.useCases.Create(req.Context(), request)
+	request := &classManagementApplication.GetClassCodeRequest{
+		UserID:  id,
+		ClassID: classID,
+	}
+
+	classCode, err := handler.useCases.GetClassCode(req.Context(), request)
 	if err != nil {
 		badRequestErrors := []error{
 			userError.ErrIdInvalid,
 			userError.ErrIdRequired,
 
-			classManagementError.ErrNameRequired,
-			classManagementError.ErrNameTooShort,
-			classManagementError.ErrGradeRequired,
-			classManagementError.ErrGradeTooShort,
-			classManagementError.ErrSubjectRequired,
-			classManagementError.ErrSubjectTooShort,
+			classManagementError.ErrIdRequired,
+			classManagementError.ErrIdInvalid,
 		}
 		if util.IsErrorType(err, badRequestErrors) {
 			resp := response.BadRequest("", err.Error())
@@ -54,8 +49,14 @@ func (handler *Handler) Create(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		if err == userError.ErrUserNotFound {
+		if err == userError.ErrUserNotFound || err == classManagementError.ErrClassNotFound || err == memberError.ErrMemberNotFound {
 			resp := response.NotFound("", err.Error())
+			response.WriteErrorResponse(w, resp)
+			return
+		}
+
+		if err == classManagementError.ErrUnauthorized {
+			resp := response.Unauthorized("", err.Error())
 			response.WriteErrorResponse(w, resp)
 			return
 		}
@@ -65,6 +66,6 @@ func (handler *Handler) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	resp := response.OK("", class, nil)
+	resp := response.OK("", classCode, nil)
 	response.WriteSuccessResponse(w, resp)
 }

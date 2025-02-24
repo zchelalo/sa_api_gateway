@@ -3,7 +3,6 @@ package userREST
 import (
 	"net/http"
 
-	userDomain "github.com/zchelalo/sa_api_gateway/internal/modules/user/domain"
 	userError "github.com/zchelalo/sa_api_gateway/internal/modules/user/error"
 	"github.com/zchelalo/sa_api_gateway/pkg/constants"
 	"github.com/zchelalo/sa_api_gateway/pkg/response"
@@ -22,12 +21,6 @@ func (handler *Handler) Get(w http.ResponseWriter, req *http.Request) {
 	if !ok {
 		resp := response.Unauthorized("", "unauthorized")
 		response.WriteErrorResponse(w, resp)
-	}
-
-	if err := userDomain.IsIdValid(id); err != nil {
-		resp := response.BadRequest("", err.Error())
-		response.WriteErrorResponse(w, resp)
-		return
 	}
 
 	user, err := handler.useCases.Get(req.Context(), id)
@@ -49,6 +42,6 @@ func (handler *Handler) Get(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	resp := response.OK("", user)
+	resp := response.OK("", user, nil)
 	response.WriteSuccessResponse(w, resp)
 }

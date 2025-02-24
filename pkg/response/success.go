@@ -3,19 +3,22 @@ package response
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/zchelalo/sa_api_gateway/pkg/meta"
 )
 
 type Success struct {
 	Status  uint32      `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
+	Meta    *meta.Meta  `json:"meta"`
 }
 
 const (
 	defaultSuccessMessage string = "success"
 )
 
-func successResponse(status uint32, message string, data interface{}) *Success {
+func successResponse(status uint32, message string, data interface{}, meta *meta.Meta) *Success {
 	if message == "" {
 		message = defaultSuccessMessage
 	}
@@ -24,6 +27,7 @@ func successResponse(status uint32, message string, data interface{}) *Success {
 		Status:  status,
 		Message: message,
 		Data:    data,
+		Meta:    meta,
 	}
 }
 
@@ -33,30 +37,30 @@ func WriteSuccessResponse(w http.ResponseWriter, resp *Success) {
 	json.NewEncoder(w).Encode(resp)
 }
 
-func OK(message string, data interface{}) *Success {
-	return successResponse(http.StatusOK, message, data)
+func OK(message string, data interface{}, meta *meta.Meta) *Success {
+	return successResponse(http.StatusOK, message, data, meta)
 }
 
-func Created(message string, data interface{}) *Success {
-	return successResponse(http.StatusCreated, message, data)
+func Created(message string, data interface{}, meta *meta.Meta) *Success {
+	return successResponse(http.StatusCreated, message, data, meta)
 }
 
-func Accepted(message string, data interface{}) *Success {
-	return successResponse(http.StatusAccepted, message, data)
+func Accepted(message string, data interface{}, meta *meta.Meta) *Success {
+	return successResponse(http.StatusAccepted, message, data, meta)
 }
 
-func NonAuthorativeInfo(message string, data interface{}) *Success {
-	return successResponse(http.StatusNonAuthoritativeInfo, message, data)
+func NonAuthorativeInfo(message string, data interface{}, meta *meta.Meta) *Success {
+	return successResponse(http.StatusNonAuthoritativeInfo, message, data, meta)
 }
 
-func NoContent(message string, data interface{}) *Success {
-	return successResponse(http.StatusNoContent, message, data)
+func NoContent(message string, data interface{}, meta *meta.Meta) *Success {
+	return successResponse(http.StatusNoContent, message, data, meta)
 }
 
-func ResetContent(message string, data interface{}) *Success {
-	return successResponse(http.StatusResetContent, message, data)
+func ResetContent(message string, data interface{}, meta *meta.Meta) *Success {
+	return successResponse(http.StatusResetContent, message, data, meta)
 }
 
-func PartialContent(message string, data interface{}) *Success {
-	return successResponse(http.StatusPartialContent, message, data)
+func PartialContent(message string, data interface{}, meta *meta.Meta) *Success {
+	return successResponse(http.StatusPartialContent, message, data, meta)
 }

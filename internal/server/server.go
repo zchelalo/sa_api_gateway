@@ -21,7 +21,7 @@ import (
 )
 
 type Server struct {
-	router  *http.ServeMux
+	router  http.Handler
 	address string
 }
 
@@ -47,8 +47,10 @@ func NewServer(address string) *Server {
 	userREST.New(router, userUseCases, mdw).SetRoutes()
 	classManagementREST.New(router, classManagementUseCases, mdw).SetRoutes()
 
+	finalRouter := mdw.Logger(accessControl(router))
+
 	return &Server{
-		router:  router,
+		router:  finalRouter,
 		address: address,
 	}
 }
@@ -56,7 +58,7 @@ func NewServer(address string) *Server {
 func (s *Server) Start() {
 	server := &http.Server{
 		Addr:         s.address,
-		Handler:      s.accessControl(s.router),
+		Handler:      s.router,
 		WriteTimeout: 10 * time.Second,
 		ReadTimeout:  10 * time.Second,
 	}
@@ -75,7 +77,7 @@ func (s *Server) Start() {
 	}
 }
 
-func (s *Server) accessControl(h http.Handler) http.Handler {
+func accessControl(h http.Handler) http.Handler {
 	allowOrigins := map[string]bool{
 		"http://localhost:5173": true,
 	}
