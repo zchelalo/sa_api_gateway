@@ -4,7 +4,7 @@ import (
 	"regexp"
 
 	"github.com/google/uuid"
-	userError "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
+	userError "github.com/zchelalo/sa_api_gateway/internal/modules/user/error"
 )
 
 const emailRegex = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`

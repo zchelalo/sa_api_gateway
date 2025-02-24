@@ -24,8 +24,10 @@ func main() {
 	bootstrap.InitRESTClient()
 
 	services := map[constants.GRPCConstants]string{
-		constants.UserMicroserviceDomain: config.UserMicroserviceDomain,
-		constants.AuthMicroserviceDomain: config.AuthMicroserviceDomain,
+		constants.UserMicroserviceDomain:            config.UserMicroserviceDomain,
+		constants.AuthMicroserviceDomain:            config.AuthMicroserviceDomain,
+		constants.ClassManagementMicroserviceDomain: config.ClassManagementMicroserviceDomain,
+		constants.MemberMicroserviceDomain:          config.ClassManagementMicroserviceDomain,
 	}
 
 	for name, addr := range services {

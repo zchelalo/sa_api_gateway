@@ -1,15 +1,19 @@
-package userREST
+package classManagementREST
 
 import (
+	"encoding/json"
 	"net/http"
 
+	classManagementApplication "github.com/zchelalo/sa_api_gateway/internal/modules/class_management/application"
+	classManagementError "github.com/zchelalo/sa_api_gateway/internal/modules/class_management/error"
 	userDomain "github.com/zchelalo/sa_api_gateway/internal/modules/user/domain"
 	userError "github.com/zchelalo/sa_api_gateway/internal/modules/user/error"
 	"github.com/zchelalo/sa_api_gateway/pkg/constants"
 	"github.com/zchelalo/sa_api_gateway/pkg/response"
+	"github.com/zchelalo/sa_api_gateway/pkg/util"
 )
 
-func (handler *Handler) Get(w http.ResponseWriter, req *http.Request) {
+func (handler *Handler) Create(w http.ResponseWriter, req *http.Request) {
 	idContext := req.Context().Value(constants.ContextUserID)
 
 	if idContext == nil {
@@ -30,9 +34,28 @@ func (handler *Handler) Get(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user, err := handler.useCases.Get(req.Context(), id)
+	request := &classManagementApplication.CreateRequest{}
+	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
+		resp := response.BadRequest("", err.Error())
+		response.WriteErrorResponse(w, resp)
+		return
+	}
+	request.UserID = id
+
+	class, err := handler.useCases.Create(req.Context(), request)
 	if err != nil {
-		if err == userError.ErrIdInvalid || err == userError.ErrIdRequired {
+		badRequestErrors := []error{
+			userError.ErrIdInvalid,
+			userError.ErrIdRequired,
+
+			classManagementError.ErrNameRequired,
+			classManagementError.ErrNameTooShort,
+			classManagementError.ErrGradeRequired,
+			classManagementError.ErrGradeTooShort,
+			classManagementError.ErrSubjectRequired,
+			classManagementError.ErrSubjectTooShort,
+		}
+		if util.IsErrorType(err, badRequestErrors) {
 			resp := response.BadRequest("", err.Error())
 			response.WriteErrorResponse(w, resp)
 			return
@@ -49,6 +72,6 @@ func (handler *Handler) Get(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	resp := response.OK("", user)
+	resp := response.OK("", class)
 	response.WriteSuccessResponse(w, resp)
 }

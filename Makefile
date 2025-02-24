@@ -12,6 +12,6 @@ proto:
 		-I=sa_proto/services \
 		--go_out=./pkg/proto --go_opt=paths=source_relative \
 		--go-grpc_out=./pkg/proto --go-grpc_opt=paths=source_relative \
-		sa_proto/services/auth.proto sa_proto/services/user.proto sa_proto/services/shared.proto
+		sa_proto/services/auth.proto sa_proto/services/user.proto sa_proto/services/class.proto sa_proto/services/member.proto sa_proto/services/shared.proto
 
 .PHONY: compose composebuild proto

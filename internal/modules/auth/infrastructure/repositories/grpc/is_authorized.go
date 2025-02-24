@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	authDomain "github.com/zchelalo/sa_api_gateway/internal/modules/auth/domain"
-	authError "github.com/zchelalo/sa_api_gateway/internal/modules/auth/errors"
+	authError "github.com/zchelalo/sa_api_gateway/internal/modules/auth/error"
 	"github.com/zchelalo/sa_api_gateway/pkg/proto"
 	"google.golang.org/grpc/codes"
 )

@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	authApplication "github.com/zchelalo/sa_api_gateway/internal/modules/auth/application"
-	userError "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
+	userError "github.com/zchelalo/sa_api_gateway/internal/modules/user/error"
 	"github.com/zchelalo/sa_api_gateway/pkg/constants"
 	"github.com/zchelalo/sa_api_gateway/pkg/response"
 	"github.com/zchelalo/sa_api_gateway/pkg/util"

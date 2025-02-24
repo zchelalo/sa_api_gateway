@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	authApplication "github.com/zchelalo/sa_api_gateway/internal/modules/auth/application"
-	userError "github.com/zchelalo/sa_api_gateway/internal/modules/user/errors"
+	userError "github.com/zchelalo/sa_api_gateway/internal/modules/user/error"
 	"github.com/zchelalo/sa_api_gateway/pkg/constants"
 	"github.com/zchelalo/sa_api_gateway/pkg/response"
 	"github.com/zchelalo/sa_api_gateway/pkg/util"
@@ -35,12 +35,10 @@ func (handler *Handler) SignIn(w http.ResponseWriter, req *http.Request) {
 			userError.ErrPasswordRequired,
 			userError.ErrPasswordInvalid,
 		}
-		for _, badRequestError := range badRequestErrors {
-			if err == badRequestError {
-				resp := response.BadRequest("", err.Error())
-				response.WriteErrorResponse(w, resp)
-				return
-			}
+		if util.IsErrorType(err, badRequestErrors) {
+			resp := response.BadRequest("", err.Error())
+			response.WriteErrorResponse(w, resp)
+			return
 		}
 
 		if err == userError.ErrUserNotFound {

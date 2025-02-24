@@ -9,6 +9,9 @@ import (
 	authApplication "github.com/zchelalo/sa_api_gateway/internal/modules/auth/application"
 	authREST "github.com/zchelalo/sa_api_gateway/internal/modules/auth/infrastructure/adapters/rest"
 	authGRPCRepo "github.com/zchelalo/sa_api_gateway/internal/modules/auth/infrastructure/repositories/grpc"
+	classManagementApplication "github.com/zchelalo/sa_api_gateway/internal/modules/class_management/application"
+	classManagementREST "github.com/zchelalo/sa_api_gateway/internal/modules/class_management/infrastructure/adapters/rest"
+	classManagementGRPCRepo "github.com/zchelalo/sa_api_gateway/internal/modules/class_management/infrastructure/repositories/grpc"
 	userApplication "github.com/zchelalo/sa_api_gateway/internal/modules/user/application"
 	userREST "github.com/zchelalo/sa_api_gateway/internal/modules/user/infrastructure/adapters/rest"
 	userGRPCRepo "github.com/zchelalo/sa_api_gateway/internal/modules/user/infrastructure/repositories/grpc"
@@ -27,20 +30,25 @@ func NewServer(address string) *Server {
 
 	authGRPCClient := bootstrap.GetGRPCClient(constants.AuthMicroserviceDomain)
 	userGRPCClient := bootstrap.GetGRPCClient(constants.UserMicroserviceDomain)
+	classManagementGRPCClient := bootstrap.GetGRPCClient(constants.ClassManagementMicroserviceDomain)
+	memberGRPCClient := bootstrap.GetGRPCClient(constants.MemberMicroserviceDomain)
 
 	authRepository := authGRPCRepo.New(proto.NewAuthServiceClient(authGRPCClient))
 	userRepository := userGRPCRepo.New(proto.NewUserServiceClient(userGRPCClient))
+	classManagementRepository := classManagementGRPCRepo.New(proto.NewClassServiceClient(classManagementGRPCClient), proto.NewMemberServiceClient(memberGRPCClient))
 
 	authUseCases := authApplication.New(authRepository)
 	userUseCases := userApplication.New(userRepository)
+	classManagementUseCases := classManagementApplication.New(classManagementRepository)
 
 	mdw := middleware.New(authUseCases)
 
 	authREST.New(router, authUseCases, mdw).SetRoutes()
 	userREST.New(router, userUseCases, mdw).SetRoutes()
+	classManagementREST.New(router, classManagementUseCases, mdw).SetRoutes()
 
 	return &Server{
-		router:  http.NewServeMux(),
+		router:  router,
 		address: address,
 	}
 }
