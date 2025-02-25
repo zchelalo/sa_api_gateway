@@ -1,11 +1,16 @@
+DOCKER_COMPOSE_FILE = ./.dockers/docker-compose.yml
+
 compose:
-	docker compose -f ./.dockers/docker-compose.yml up
+	docker compose -f $(DOCKER_COMPOSE_FILE) up
 
-composebuild:
-	docker compose -f ./.dockers/docker-compose.yml up --build
+compose-build:
+	docker compose -f $(DOCKER_COMPOSE_FILE) up --build
 
-composebuilddetached:
-	docker compose -f ./.dockers/docker-compose.yml up --build -d
+compose-build-detached:
+	docker compose -f $(DOCKER_COMPOSE_FILE) up --build -d
+
+create-envs:
+	cp .env.example app.env
 
 proto:
 	protoc --experimental_allow_proto3_optional \
@@ -14,4 +19,4 @@ proto:
 		--go-grpc_out=./pkg/proto --go-grpc_opt=paths=source_relative \
 		sa_proto/services/auth.proto sa_proto/services/user.proto sa_proto/services/class.proto sa_proto/services/member.proto sa_proto/services/shared.proto
 
-.PHONY: compose composebuild proto
+.PHONY: compose compose-build compose-build-detached create-envs proto
