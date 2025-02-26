@@ -19,7 +19,8 @@ This submodule functions as a single entry point for the application. It is resp
 *Note: Keep in mind that the entire project was tested on WSL.*
 
 ### Project cloning
-If you haven't already cloned the project, you can do so by running `git clone <url>`
+If you haven't already cloned the project, you can do so by running `git clone <url>`.
+Each of the following steps can be executed by running `npm run setup` (this command should be executed only the first time).
 
 ### Environment variables
 To configure the environment variables within the project, there is a command in the Makefile file called `make create-envs`. When executed, it will copy the ".env.example" file to a "app.env" file. If you need to change something, just modify the newly created "app.env" file.
