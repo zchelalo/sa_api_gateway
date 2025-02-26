@@ -1,3 +1,6 @@
+include app.env
+export $(shell sed 's/=.*//' app.env)
+
 DOCKER_COMPOSE_FILE = ./.dockers/docker-compose.yml
 
 setup:
