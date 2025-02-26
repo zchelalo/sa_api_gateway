@@ -1,5 +1,7 @@
-include app.env
-export $(shell sed 's/=.*//' app.env)
+ifneq ("$(wildcard app.env)", "")
+	include app.env
+	export $(shell sed 's/=.*//' app.env)
+endif
 
 DOCKER_COMPOSE_FILE = ./.dockers/docker-compose.yml
 
